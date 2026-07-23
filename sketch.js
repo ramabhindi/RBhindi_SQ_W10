@@ -225,12 +225,12 @@ function guess(direction) {
 
   let correct = false;
 
-  if (direction === "higher" && nextCard.value > currentCard.value) {
+  if (direction === "higher" && nextCard.value >= currentCard.value) {
     correct = true;
-  } else if (direction === "lower" && nextCard.value < currentCard.value) {
+  } else if (direction === "lower" && nextCard.value <= currentCard.value) {
     correct = true;
   }
-  // Equal cards count as wrong — the player must commit to a direction
+  // Equal cards count as correct
 
   if (correct) {
     score++;
@@ -424,7 +424,7 @@ function drawStartScreen() {
   );
   text("Reach the target score to advance.", width / 2, height / 2 + 10);
   text(
-    "Equal cards count as wrong — commit to a direction!",
+    "Equal cards are a correct answer!",
     width / 2,
     height / 2 + 30,
   );
