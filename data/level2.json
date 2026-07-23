@@ -13,6 +13,8 @@
     { "value": 10, "label": "10" },
     { "value": 11, "label": "J"  },
     { "value": 12, "label": "Q"  },
-    { "value": 13, "label": "K"  }
+    { "value": 13, "label": "K"  },
+    { "value": 0, "label": "JOKER", "joker": true}
+
   ]
 }

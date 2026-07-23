@@ -26,6 +26,7 @@
     { "value": 10, "label": "10", "suit": "♥" },
     { "value": 11, "label": "J",  "suit": "♥" },
     { "value": 12, "label": "Q",  "suit": "♥" },
-    { "value": 13, "label": "K",  "suit": "♥" }
+    { "value": 13, "label": "K",  "suit": "♥" },
+        { "value": 0, "label": "JOKER", "joker": true}
   ]
 }

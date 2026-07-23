@@ -76,6 +76,7 @@ let totalScore = 0;
 let result = "";
 let resultTimer = 0;
 const RESULT_FRAMES = 45; // how long to show correct/wrong message
+let gameOverSound;
 
 // ------------------------------------------------------------
 // BUTTONS
@@ -93,6 +94,8 @@ function preload() {
   levelData[1] = loadJSON("data/level1.json");
   levelData[2] = loadJSON("data/level2.json");
   levelData[3] = loadJSON("data/level3.json");
+
+gameOverSound = loadSound("/assets/sounds/WOMPWOMP.mp3");
 }
 
 // ============================================================
@@ -140,17 +143,23 @@ function loadLevel(num) {
   targetScore = data.targetScore;
 
   // Copy and shuffle the deck using Fisher-Yates
-  let raw = data.cards.slice(); // copy so JSON stays intact
-  for (let i = raw.length - 1; i > 0; i--) {
-    let j = floor(random(i + 1));
-    let tmp = raw[i];
-    raw[i] = raw[j];
-    raw[j] = tmp;
-  }
-  deck = raw;
-  deckIndex = 0;
-  score = 0;
-  result = "";
+let raw = data.cards.slice(); // copy so JSON stays intact
+for (let i = raw.length - 1; i > 0; i--) {
+  let j = floor(random(i + 1));
+  let tmp = raw[i];
+  raw[i] = raw[j];
+  raw[j] = tmp;
+}
+
+// Prevent a Joker from being the starting card
+while (raw[0].joker === true || raw[0].label === "JOKER") {
+  raw.push(raw.shift());
+}
+
+deck = raw;
+deckIndex = 0;
+score = 0;
+result = "";
 
   // Deal the first card
   currentCard = deck[deckIndex];
@@ -183,14 +192,18 @@ function updateResult() {
   resultTimer--;
 
   if (resultTimer === 0) {
-    if (result === "wrong") {
-      gameState = STATE_OVER;
-      return;
-    }
 
-    result = "";
+if (result === "wrong") {
+  gameState = STATE_OVER;
 
-    // Check win condition
+if (gameOverSound) {
+  gameOverSound.play();
+}
+
+  return;
+}
+
+    // Correct and Joker both continue
     if (score >= targetScore) {
       if (currentLevel < MAX_LEVELS) {
         setTimeout(() => {
@@ -202,12 +215,16 @@ function updateResult() {
       return;
     }
 
-    // Advance to the next card
-    currentCard = nextCard;
-    deckIndex++;
-    nextCard = deck[deckIndex] || null;
+  // Advance to next card
+currentCard = nextCard;
+deckIndex++;
+nextCard = deck[deckIndex] || null;
 
-    // Ran out of cards before reaching target — game over
+
+    // Clear result AFTER advancing
+    result = "";
+
+    // Out of cards
     if (!nextCard && score < targetScore) {
       gameState = STATE_OVER;
     }
@@ -225,22 +242,30 @@ function guess(direction) {
 
   let correct = false;
 
-if (nextCard.joker) { //IF THE NEXT CARD IS A JOKER, REDUCE SCORE BY 1
-  score = max(0, score - 1);
+  // Joker = both Higher and Lower are correct
+  if (nextCard.joker) {
 
-  result = "joker";
-  resultTimer = RESULT_FRAMES;
+    // Lose 2 points
+    score = max(0, score - 2);
 
-  return;
-}
+    // Guaranteed correct answer gives 1 point back
+    score++;
+    totalScore++;
+
+    result = "joker";
+    resultTimer = RESULT_FRAMES;
+
+    return;
+  }
 
 
+  // Normal card comparison
   if (direction === "higher" && nextCard.value >= currentCard.value) {
     correct = true;
   } else if (direction === "lower" && nextCard.value <= currentCard.value) {
     correct = true;
   }
-  // Equal cards count as correct
+
 
   if (correct) {
     score++;
@@ -290,10 +315,10 @@ function drawGame() {
       cardY + CARD_H + 90,
     );
   } else if (result === "joker") {
-    fill(255, 180, 0);
-    textAlign(CENTER);
-    textSize(22);
-    text("Joker! Score -1", width / 2, cardY + CARD_H + 90);
+  fill(255, 180, 0);
+  textAlign(CENTER);
+  textSize(22);
+  text("Joker! -2 points +1 bonus = -1", width / 2, cardY + CARD_H + 90);
 }
   
 
@@ -314,7 +339,7 @@ function drawGame() {
 function drawCard(card, x, y, faceUp) {
   push();
 
-if (card.joker) { //if the card is a joker, display a big J in the middle of card.
+if (faceUp && card && (card.joker === true || card.label === "JOKER")) {
   fill(240, 238, 230);
   stroke(180);
   strokeWeight(2);
@@ -325,7 +350,7 @@ if (card.joker) { //if the card is a joker, display a big J in the middle of car
 
   textAlign(CENTER);
   textSize(72);
-  text("J", x + CARD_W / 2, y + CARD_H / 2 + 24);
+  text("0", x + CARD_W / 2, y + CARD_H / 2 + 24);
 
   pop();
   return;
