@@ -95,7 +95,7 @@ function preload() {
   levelData[2] = loadJSON("data/level2.json");
   levelData[3] = loadJSON("data/level3.json");
 
-//gameOverSound = loadSound("assets/sounds/WOMPWOMP.mp3"); //REMOVED. BREAKING MY CODE FOR GOD KNOWS WHY
+gameOverSound = loadSound("assets/sounds/WOMPWOMP.mp3");
 }
 
 // ============================================================
