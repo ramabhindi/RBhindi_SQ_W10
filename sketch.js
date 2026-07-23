@@ -95,7 +95,7 @@ function preload() {
   levelData[2] = loadJSON("data/level2.json");
   levelData[3] = loadJSON("data/level3.json");
 
-gameOverSound = loadSound("/assets/sounds/WOMPWOMP.mp3");
+gameOverSound = loadSound("assets/sounds/WOMPWOMP.mp3");
 }
 
 // ============================================================
