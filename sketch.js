@@ -225,6 +225,16 @@ function guess(direction) {
 
   let correct = false;
 
+if (nextCard.joker) { //IF THE NEXT CARD IS A JOKER, REDUCE SCORE BY 1
+  score = max(0, score - 1);
+
+  result = "joker";
+  resultTimer = RESULT_FRAMES;
+
+  return;
+}
+
+
   if (direction === "higher" && nextCard.value >= currentCard.value) {
     correct = true;
   } else if (direction === "lower" && nextCard.value <= currentCard.value) {
@@ -279,7 +289,13 @@ function drawGame() {
       width / 2,
       cardY + CARD_H + 90,
     );
-  }
+  } else if (result === "joker") {
+    fill(255, 180, 0);
+    textAlign(CENTER);
+    textSize(22);
+    text("Joker! Score -1", width / 2, cardY + CARD_H + 90);
+}
+  
 
   // --- Buttons (only shown when no result is displaying) ---
   if (result === "") {
@@ -298,6 +314,22 @@ function drawGame() {
 function drawCard(card, x, y, faceUp) {
   push();
 
+if (card.joker) { //if the card is a joker, display a big J in the middle of card.
+  fill(240, 238, 230);
+  stroke(180);
+  strokeWeight(2);
+  rect(x, y, CARD_W, CARD_H, 12);
+
+  fill(255, 180, 0);
+  noStroke();
+
+  textAlign(CENTER);
+  textSize(72);
+  text("J", x + CARD_W / 2, y + CARD_H / 2 + 24);
+
+  pop();
+  return;
+}
   if (faceUp && card) {
     // Card face
     fill(240, 238, 230);
